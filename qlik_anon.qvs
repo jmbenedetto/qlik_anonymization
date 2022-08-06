@@ -1,0 +1,79 @@
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+    Name : Anon_Resampling
+    
+----------------------------------------------------------------------
+ 	Original Rule :	Replace with value sampled from the same distribution :
+		1 - Table Name
+        2 - Field Name
+ 
+-------------------------------------------------------------------*/
+
+SUB Anon_Resampling (P_TABLENAME , P_FIELDNAME)
+
+	
+TRACE ##################################################;
+TRACE ## Starting Function : Anon_Resampling  ##;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+    //---------------------------------------//
+    //-- Fake Name Table dynamic auto rows --//
+    
+    [DistinctValues]:
+    Load Distinct 
+    	[$(P_FIELDNAME)], 
+        RowNo() as [RowID],
+        Rand() as [Random]
+    Resident $(P_TABLENAME);
+    
+    Let vTotalLines = NoOfRows('DistinctValues');
+    
+    TRACE # Total Distinct Values : $(vTotalLines) #;
+    
+    //-------------------------------------------------------------------//
+    
+    Inner Join ([DistinctValues])
+
+    Load
+        [RowID],
+        [Ordered$(P_FIELDNAME)],
+    Load
+        [$(P_FIELDNAME)] as [Anon.$(P_FIELDNAME)],
+        RowNo() as [RowID]
+        [Random],
+    Resident [DistinctValues]
+    Order By [Random];
+    
+    // -- Final Table with the exactly amount of lines -- //
+    
+        [AnonMapping]:
+        Mapping
+        LOAD
+            [$(P_FIELDNAME)],
+            [Anon.$(P_FIELDNAME)]
+        Resident [DistinctValues];
+
+        Drop table [DistinctValues];
+        
+	NoConcatenate
+    
+	[Anon_$(P_TABLENAME)]:
+    LOAD
+    	*,
+        ApplyMap([AnonMapping],[$(P_FIELDNAME)],'Anon_Error')	as [Anon.$(P_FIELDNAME)]
+    Resident $(P_TABLENAME);
+    
+    Drop table $(P_TABLENAME);
+    
+    Rename table Anon_$(P_TABLENAME) to $(P_TABLENAME);
+    
+// -- SUB END -- //    
+TRACE ##################################################;
+TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+END SUB
+
+//#########################################################################################//
