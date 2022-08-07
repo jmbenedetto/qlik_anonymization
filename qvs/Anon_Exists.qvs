@@ -1,0 +1,22 @@
+SUB Anon_Exists (P_TABLENAME , P_FIELDNAME)
+
+TRACE ##################################################;
+TRACE ## Starting Function : Anon_Exists  ##;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+Anon_$(P_TABLENAME):
+LOAD
+*,
+IF(IsNull(EmptyIsNull([$(P_FIELDNAME)])),0,1) as [Anon_$(P_FIELDNAME)]
+Resident $(P_TABLENAME);
+
+Drop table $(P_TABLENAME);
+
+Rename table Anon_$(P_TABLENAME) to $(P_TABLENAME);
+       
+TRACE ##################################################;
+TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+END SUB
