@@ -1,0 +1,71 @@
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+Name : Anon_Resampling
+
+----------------------------------------------------------------------
+Original Rule :	Replace with other values from the same domain :
+1 - Table Name
+2 - Field Name
+
+-------------------------------------------------------------------*/
+
+SUB Anon_Resampling (P_TABLENAME , P_FIELDNAME)
+
+
+TRACE ##################################################;
+TRACE ## Starting Function : Anon_Resampling  ##;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+//---------------------------------------//
+
+[DistinctValues]:
+Load Distinct 
+[$(P_FIELDNAME)] as [OldDistinctValue],
+RowNo() as [RowID],
+Rand() as [Random]
+Resident $(P_TABLENAME);
+
+[AnonDistinctMapping]:
+Mapping
+Load
+RowNo(),
+[OldDistinctValue];
+Load
+[OldDistinctValue],
+[Random]
+Resident [DistinctValues]
+Order By [Random];
+
+[AnonDistinctValues]:
+LOAD
+*,
+ApplyMap('AnonDistinctMapping',RowID,'Anon_Error') as [NewDistinctValue]
+Resident DistinctValues;
+
+Drop table DistinctValues;
+
+[AnonMapping]:
+Mapping
+Load
+[OldDistinctValue],
+[NewDistinctValue]
+Resident [AnonDistinctValues];
+
+Drop table AnonDistinctValues;
+
+[AnonValues]:
+LOAD
+*,
+ApplyMap('AnonMapping',[$(P_FIELDNAME)],'Anon_Error') as [Anon_$(P_FIELDNAME)]
+Resident $(P_TABLENAME);
+
+Drop table $(P_TABLENAME);
+
+Rename table AnonValues to $(P_TABLENAME);
+
+
+END SUB
+
+//#########################################################################################//
