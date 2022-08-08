@@ -1,0 +1,119 @@
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+    Name : Anon_FakeWord
+    
+----------------------------------------------------------------------
+ 	Original Rule :	Replace by fake data (random word)
+ 	Params :
+    
+		1 - Table Name
+        2 - Field Name
+ 
+-------------------------------------------------------------------*/
+
+SUB Anon_FakeWord (P_TABLENAME , P_FIELDNAME)
+
+	
+TRACE ##################################################;
+TRACE ## Starting Function : Anon_FakeWord  ##;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+
+
+// Declaring all possibles Vowel and Consonant
+
+Let vVowel = 'a,e,i,o,u,y';
+Let vConsonant = 'b,c,d,f,g,h,j,k,l,m,n,p,q,r,t,v,x,z';
+
+
+// Mixing Vowel and Consonant based on the total distinct necessary words
+
+	TempDistinct:
+    Load Distinct [$(P_FIELDNAME)] Resident $(P_TABLENAME) where not IsNull([$(P_FIELDNAME)]);
+    
+    Let vTotalLines = NoOfRows('TempDistinct');
+    
+    TRACE # Total Distinct Words : $(vTotalLines) #;
+    
+    //---------------------------------------//
+    //-- Fake WORD Table dynamic auto rows --//
+
+    FakeWord_TMP:
+    LOAD  
+		// 1 letter : Vowel
+            SubField('$(vVowel)',',',Floor(Rand()*6)+1) &
+        // 2 letter : Consonant
+            SubField('$(vConsonant)',',',Floor(Rand()*18)+1) &
+        // 3 letter : Vowel
+            SubField('$(vVowel)',',',Floor(Rand()*6)+1) &
+        // 4 letter : Consonant
+            SubField('$(vConsonant)',',',Floor(Rand()*18)+1) &
+        // 5 letter : Vowel
+            SubField('$(vVowel)',',',Floor(Rand()*6)+1) 			as RandomWord
+
+    AutoGenerate ($(vTotalLines) + 1);
+    
+    
+    //-------------------------------------------------------------------//
+    //-- Mapping table with True Name + Fake Name (ensure that the same words will always be given the same fake word)
+    
+        NoConcatenate
+
+        MappingTMP:
+        Load RowNo() 					 as Line,
+        	 [$(P_FIELDNAME)]			 as True
+        Resident TempDistinct;
+        
+        Left Join (MappingTMP)
+        
+        LOAD RowNo() 					as Line,
+             RandomWord  				as Fake
+        Resident FakeWord_TMP;  
+        
+        Drop table TempDistinct;
+        
+    //-------------------------------------------------------------------//
+    
+    // -- Final FakeName Table with the exactly amount of lines -- //
+    
+        MapFakeWord:
+        Mapping
+        LOAD
+            True,
+            Fake
+        Resident MappingTMP;
+
+        Drop table MappingTMP;
+        Drop table FakeWord_TMP;
+	
+    
+    //-- END Fake Table --//
+    //---------------------------------------//
+    
+        
+	NoConcatenate
+    
+	Anon_$(P_TABLENAME):
+
+    LOAD
+    	*,
+        ApplyMap('MapFakeWord',[$(P_FIELDNAME)],Null())						as [Anon.$(P_FIELDNAME)]
+        
+        
+    Resident $(P_TABLENAME);
+    
+    Drop table $(P_TABLENAME);
+    
+    Rename table Anon_$(P_TABLENAME) to $(P_TABLENAME);
+    
+
+// -- SUB END -- //    
+TRACE ##################################################;
+TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+END SUB
+
+//#########################################################################################//

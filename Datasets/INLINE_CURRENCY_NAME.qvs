@@ -1,0 +1,75 @@
+// 70 lines
+INLINE_CURRENCY_NAME:
+LOAD * INLINE [
+Field
+lek
+dinar
+kwanza
+peso
+dram
+dollar
+euro
+manat
+rouble
+boliviano
+pula
+real
+lev
+escudo
+riel
+yuan
+franc
+colon
+kuna
+koruna
+kroner
+pound
+lari
+cedi
+quetzal
+british pound sterling
+lempira
+forint
+krona
+rupee
+rupiah
+shekel
+yen
+tenge
+shilling
+won
+som
+kip
+pataca
+ariary
+kwacha
+ringgit
+rufiyaa
+ouguiya
+leu
+tugrik
+dirham
+metical
+kyat
+cordoba oro
+naira
+denar
+rial
+kina
+guarani
+nuevo sol
+zloty
+riyal
+ruble
+rand
+lilangeni
+somoni
+baht
+US dollar
+lira
+hryvnia
+sterling
+sum
+bolivar
+dong
+];

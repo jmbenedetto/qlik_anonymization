@@ -1,0 +1,48 @@
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+    Name : Anon_Tokenize
+    
+----------------------------------------------------------------------
+ 	Original Rule :	Token with 10 chars
+ 	Params :
+
+		1 - Table Name
+        2 - Field Name
+        3 - Token Len
+ 
+-------------------------------------------------------------------*/
+
+SUB Anon_Tokenize (P_TABLENAME , P_FIELDNAME , P_TOKENLEN)
+
+	
+TRACE ####################################################;
+TRACE ## Starting Function : Anon_Tokenize  ##;
+TRACE ## Dimension : $(P_INLINETABLE) 					 #;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) 			 #;
+TRACE ####################################################;
+        
+	NoConcatenate
+    
+	[Anon_$(P_TABLENAME)]:
+    LOAD
+    	*,
+        
+        Left(Hash128([$(P_FIELDNAME)]),$(P_TOKENLEN))		as [Anon.$(P_FIELDNAME)]
+        
+        
+    Resident [$(P_TABLENAME)];
+    
+    Drop table [$(P_TABLENAME)];
+    
+    Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
+    
+// -- SUB END -- //    
+
+TRACE ##################################################;
+TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
+TRACE ##################################################;
+
+END SUB
+
+//#########################################################################################//

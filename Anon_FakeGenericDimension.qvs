@@ -1,0 +1,113 @@
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+    Name : Anon_FakeGenericDimension
+    
+----------------------------------------------------------------------
+ 	Original Rule :	Replace Generic Master Data , from Inline possibles
+ 	Params :
+
+		1 - Table Name
+        2 - Field Name
+        3 - Inline Table Name (From DataSets folder)
+        
+-------------------------------------------------------------------*/
+
+SUB Anon_FakeGenericDimension (P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
+
+	
+TRACE ####################################################;
+TRACE ## Starting Function : Anon_FakeGenericDimension  ##;
+TRACE ## Dimension : $(P_INLINETABLE) 					 #;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) 			 #;
+TRACE ####################################################;
+
+    
+    
+    //---------------------------------------//
+    //-- Fake Name Table dynamic auto rows --//
+    
+    TempDistinct:
+    Load Distinct [$(P_FIELDNAME)] Resident [$(P_TABLENAME)] where not IsNull([$(P_FIELDNAME)]);
+    
+    Let vTotalLines = NoOfRows('TempDistinct');
+    
+    TRACE # Total Distinct Dimension Values : $(vTotalLines) #;
+    
+    //-------------------------------------------------------------------//
+	
+    NoConcatenate
+    
+    FakeInline_TMP:
+    LOAD
+        Field
+    Resident [$(P_INLINETABLE)];
+
+    Join (FakeInline_TMP)
+
+    Load 
+    	RowNo() as Multiply
+    Autogenerate ceil($(vTotalLines)/NoOfRows('FakeInline_TMP'));   //--> Multiply by exatcly amount of rows
+    
+    //-------------------------------------------------------------------//
+    //-- Mapping table with True Name + Fake Name (ensure that the same true name will always be given the same fake name)
+    
+        NoConcatenate
+
+        MappingTMP:
+        Load RowNo() 					 as Line,
+        	 [$(P_FIELDNAME)]			 as True
+        Resident TempDistinct;
+        
+        Left Join (MappingTMP)
+        
+        LOAD RowNo() 					 			as Line,
+             Field & ' - ' & Multiply  				as Fake
+        Resident FakeInline_TMP;  
+        
+        Drop table TempDistinct;
+        // Drop table [$(P_INLINETABLE)]; --> use onlye when must_include
+        
+    //-------------------------------------------------------------------//
+    
+    // -- Final Fake Dimension Table with the exactly amount of lines , based on the selected INLINE map -- //
+    
+        [Map_$(P_INLINETABLE)]:
+        Mapping
+        LOAD
+            True,
+            Fake
+        Resident MappingTMP;
+
+        Drop table MappingTMP;
+        Drop table FakeInline_TMP;
+	
+    
+    //-- END Fake Table --//
+    //---------------------------------------//
+        
+	NoConcatenate
+    
+	[Anon_$(P_TABLENAME)]:
+    LOAD
+    	*,
+        
+        ApplyMap('Map_$(P_INLINETABLE)',[$(P_FIELDNAME)],Null())		as [Anon.$(P_FIELDNAME)]
+        
+        
+    Resident [$(P_TABLENAME)];
+    
+    Drop table [$(P_TABLENAME)];
+    
+    Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
+    
+// -- SUB END -- //    
+
+TRACE ##################################################;
+TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
+TRACE # With Inline table : $(P_INLINETABLE)           #;
+TRACE ##################################################;
+
+END SUB
+
+//#########################################################################################//

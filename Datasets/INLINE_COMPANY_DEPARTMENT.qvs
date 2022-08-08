@@ -1,0 +1,15 @@
+// 10 lines
+INLINE_COMPANY_DEPARTMENT:
+LOAD * INLINE [
+Field
+Human Resources
+IT
+Accounting
+Finance
+Marketing
+Research and Development (R&D)
+Production
+Customer service
+Sales
+Administration
+];

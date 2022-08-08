@@ -1,0 +1,105 @@
+//100 lines
+INLINE_JOB_TITLE:
+LOAD * INLINE [
+Field
+IT Support Staff
+Cashier
+Cash Manager
+Cook
+HR Specialist
+Call Center Representative
+Biologist
+Machine Operator
+Electrician
+Pharmacist
+Stockbroker
+Chef Manager
+Retail Trainee
+Fabricator
+Bellman
+Inspector
+Restaurant Manager
+Budget Analyst
+Front Desk Coordinator
+Web Developer
+Treasurer
+Mobile Developer
+Audiologist
+Dentist
+Bookkeeper
+Production Painter
+Insurance Broker
+CNC Operator
+Paramedic
+Design Engineer
+Project Manager
+Physician
+Auditor
+Banker
+Accountant
+Steward
+Investment  Advisor
+Webmaster
+Healthcare Specialist
+Baker
+Software Engineer
+Systems Administrator
+Ambulatory Nurse
+Food Technologist
+Staffing Consultant
+Doctor
+Assistant Buyer
+HR Coordinator
+Global Logistics Supervisor
+Executive Director
+Clerk
+Business Broker
+Loan Officer
+Operator
+Service Supervisor
+Health Educator
+Designer
+Lecturer
+Associate Professor
+Laboratory Technician
+Administration / Office
+Arts and Culture
+Board Member
+Accounting
+Administrative
+Arts and Design
+Business Development
+Community and Social Services
+Consulting
+Education
+Engineering
+Entrepreneurship
+Finance
+Healthcare Services
+Human Resources
+Information Technology
+Legal
+Marketing
+Media and Communication
+Military and Protective Services
+Operations
+Product Management
+Program and Project Management
+Purchasing
+Quality Assurance
+Real Estate
+Research
+Sales
+Support
+Company Secretary
+Managing Director
+Member of the Management Board
+Training and Education
+Transport and Logistics
+Media
+General Manager
+Chairman 
+Executive Vice President
+Chief Financial Officer
+Chief Operating Officer
+];
