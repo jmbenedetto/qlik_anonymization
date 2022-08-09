@@ -6,20 +6,22 @@
 ----------------------------------------------------------------------
  	Original Rule :	Replace Generic Master Data , from Inline possibles
  	Params :
-
 		1 - Table Name
         2 - Field Name
-        3 - Inline Table Name (From DataSets folder)
+        3 - Inline Table Name
         
+ 
 -------------------------------------------------------------------*/
+
+let vInlineTable = 'INLINE_PERSON_NAME'; //--> DO NOT DELETE THIS LINE, just to not fail on the first execution
 
 SUB Anon_FakeGenericDimension (P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
 
 	
 TRACE ####################################################;
 TRACE ## Starting Function : Anon_FakeGenericDimension  ##;
-TRACE ## Dimension : $(P_INLINETABLE) 					 #;
-TRACE ## Anonymizing Field : $(P_FIELDNAME) 			 #;
+TRACE ## Dimension : $(P_INLINETABLE) #;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
 TRACE ####################################################;
 
     
@@ -35,19 +37,17 @@ TRACE ####################################################;
     TRACE # Total Distinct Dimension Values : $(vTotalLines) #;
     
     //-------------------------------------------------------------------//
-	
-    NoConcatenate
-    
-    FakeInline_TMP:
-    LOAD
-        Field
-    Resident [$(P_INLINETABLE)];
+    //-- Including External QVS with ALL current and future Inlines
 
-    Join (FakeInline_TMP)
+    LET vInlineTable = '$(P_INLINETABLE)'; //--> not working with the default param
+    	
+    	$(must_include=[lib://:DataFiles/$(vInlineTable).qvs]); //must include the INLINE table and delete later
+        
+    Join ($(P_INLINETABLE))
 
     Load 
     	RowNo() as Multiply
-    Autogenerate ceil($(vTotalLines)/NoOfRows('FakeInline_TMP'));   //--> Multiply by exatcly amount of rows
+    Autogenerate ceil($(vTotalLines)/NoOfRows('$(P_INLINETABLE)'));   //--> Multiply by exatcly amount of rows
     
     //-------------------------------------------------------------------//
     //-- Mapping table with True Name + Fake Name (ensure that the same true name will always be given the same fake name)
@@ -63,10 +63,10 @@ TRACE ####################################################;
         
         LOAD RowNo() 					 			as Line,
              Field & ' - ' & Multiply  				as Fake
-        Resident FakeInline_TMP;  
+        Resident [$(P_INLINETABLE)];  
         
         Drop table TempDistinct;
-        // Drop table [$(P_INLINETABLE)]; --> use onlye when must_include
+        Drop table [$(P_INLINETABLE)];
         
     //-------------------------------------------------------------------//
     
@@ -80,7 +80,6 @@ TRACE ####################################################;
         Resident MappingTMP;
 
         Drop table MappingTMP;
-        Drop table FakeInline_TMP;
 	
     
     //-- END Fake Table --//

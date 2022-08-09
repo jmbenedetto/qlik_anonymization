@@ -6,20 +6,18 @@
 ----------------------------------------------------------------------
  	Original Rule :	Token with 10 chars
  	Params :
-
 		1 - Table Name
         2 - Field Name
-        3 - Token Len
  
 -------------------------------------------------------------------*/
 
-SUB Anon_Tokenize (P_TABLENAME , P_FIELDNAME , P_TOKENLEN)
+SUB Anon_Tokenize (P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
 
 	
 TRACE ####################################################;
 TRACE ## Starting Function : Anon_Tokenize  ##;
-TRACE ## Dimension : $(P_INLINETABLE) 					 #;
-TRACE ## Anonymizing Field : $(P_FIELDNAME) 			 #;
+TRACE ## Dimension : $(P_INLINETABLE) #;
+TRACE ## Anonymizing Field : $(P_FIELDNAME) #;
 TRACE ####################################################;
         
 	NoConcatenate
@@ -28,7 +26,7 @@ TRACE ####################################################;
     LOAD
     	*,
         
-        Left(Hash128([$(P_FIELDNAME)]),$(P_TOKENLEN))		as [Anon.$(P_FIELDNAME)]
+        Left(Hash128([$(P_FIELDNAME)]),10)		as [Anon.$(P_FIELDNAME)]
         
         
     Resident [$(P_TABLENAME)];
