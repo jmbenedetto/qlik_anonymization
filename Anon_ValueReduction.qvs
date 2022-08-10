@@ -28,8 +28,8 @@ TRACE ##################################################;
         
         IF(
         	[$(P_FIELDNAME)] >=0,
-            	round([$(P_FIELDNAME)] * (2/3) + 50000),
-                	round([$(P_FIELDNAME)] * (2/3) - 50000)
+            	round([$(P_FIELDNAME)] * (2/3) + 500),
+                	round([$(P_FIELDNAME)] * (2/3) - 500)
         ) 											as [Anon.$(P_FIELDNAME)]
         
         

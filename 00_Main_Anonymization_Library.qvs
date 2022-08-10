@@ -5,3 +5,4 @@ $(must_include=[lib://:DataFiles/Anon_Resampling.qvs]);
 $(must_include=[lib://:DataFiles/Anon_Scrambling.qvs]);
 $(must_include=[lib://:DataFiles/Anon_Tokenize.qvs]);
 $(must_include=[lib://:DataFiles/Anon_ValueReduction.qvs]);
+$(must_include=[lib://:DataFiles/Anon_FakeItSelfDimension.qvs]);
