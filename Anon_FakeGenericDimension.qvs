@@ -6,16 +6,17 @@
 ----------------------------------------------------------------------
  	Original Rule :	Replace Generic Master Data , from Inline possibles
  	Params :
-		1 - Table Name
-        2 - Field Name
-        3 - Inline Table Name
+    	1 - Delete Original Field (Y/N)
+		2 - Table Name
+        3 - Field Name
+        4 - Inline Table Name
         
  
 -------------------------------------------------------------------*/
 
 let vInlineTable = 'INLINE_PERSON_NAME'; //--> DO NOT DELETE THIS LINE, just to not fail on the first execution
 
-SUB Anon_FakeGenericDimension (P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
+SUB Anon_FakeGenericDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
 
 	
 TRACE ####################################################;
@@ -71,8 +72,9 @@ TRACE ####################################################;
     //-------------------------------------------------------------------//
     
     // -- Final Fake Dimension Table with the exactly amount of lines , based on the selected INLINE map -- //
+    // -- Important : FOR KEYS , will work fine because applymap will use the first value occurrence and the applymap will be the same name (map auto concatenate)
     
-        [Map_$(P_INLINETABLE)]:
+        [Map_$(P_FIELDNAME)]:  
         Mapping
         LOAD
             True,
@@ -84,14 +86,14 @@ TRACE ####################################################;
     
     //-- END Fake Table --//
     //---------------------------------------//
-        
+    
 	NoConcatenate
     
-	[Anon_$(P_TABLENAME)]:
-    LOAD
-    	*,
-        
-        ApplyMap('Map_$(P_INLINETABLE)',[$(P_FIELDNAME)],Null())		as [Anon.$(P_FIELDNAME)]
+    
+ 	[Anon_$(P_TABLENAME)]:
+     LOAD
+     		*,
+        ApplyMap('Map_$(P_FIELDNAME)',[$(P_FIELDNAME)],Null())		as [Anon.$(P_FIELDNAME)]	
         
         
     Resident [$(P_TABLENAME)];
@@ -99,6 +101,11 @@ TRACE ####################################################;
     Drop table [$(P_TABLENAME)];
     
     Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
+    
+    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+    END IF;
+   
     
 // -- SUB END -- //    
 
