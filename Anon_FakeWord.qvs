@@ -6,13 +6,13 @@
 ----------------------------------------------------------------------
  	Original Rule :	Replace by fake data (random word)
  	Params :
-    
-		1 - Table Name
-        2 - Field Name
+    	1 - Delete Original Field (Y/N)
+		2 - Table Name
+        3 - Field Name
  
 -------------------------------------------------------------------*/
 
-SUB Anon_FakeWord (P_TABLENAME , P_FIELDNAME)
+SUB Anon_FakeWord (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME)
 
 	
 TRACE ##################################################;
@@ -78,7 +78,7 @@ Let vConsonant = 'b,c,d,f,g,h,j,k,l,m,n,p,q,r,t,v,x,z';
     
     // -- Final FakeName Table with the exactly amount of lines -- //
     
-        MapFakeWord:
+        [Map_$(P_FIELDNAME)]:
         Mapping
         LOAD
             True,
@@ -99,7 +99,8 @@ Let vConsonant = 'b,c,d,f,g,h,j,k,l,m,n,p,q,r,t,v,x,z';
 
     LOAD
     	*,
-        ApplyMap('MapFakeWord',[$(P_FIELDNAME)],Null())						as [Anon.$(P_FIELDNAME)]
+   
+        ApplyMap('Map_$(P_FIELDNAME)',[$(P_FIELDNAME)],Null())						as [Anon.$(P_FIELDNAME)]
         
         
     Resident $(P_TABLENAME);
@@ -107,6 +108,10 @@ Let vConsonant = 'b,c,d,f,g,h,j,k,l,m,n,p,q,r,t,v,x,z';
     Drop table $(P_TABLENAME);
     
     Rename table Anon_$(P_TABLENAME) to $(P_TABLENAME);
+    
+    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+    END IF;   
     
 
 // -- SUB END -- //    

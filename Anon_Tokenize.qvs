@@ -6,13 +6,14 @@
 ----------------------------------------------------------------------
  	Original Rule :	Token with 10 chars
  	Params :
-		1 - Table Name
-        2 - Field Name
-        3 - # tokens
+    	1 - Delete Original Field (Y/N)
+		2 - Table Name
+        3 - Field Name
+        4 - # tokens
  
 -------------------------------------------------------------------*/
 
-SUB Anon_Tokenize (P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
+SUB Anon_Tokenize (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
 
 	
 TRACE ####################################################;
@@ -35,6 +36,10 @@ TRACE ####################################################;
     Drop table [$(P_TABLENAME)];
     
     Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
+    
+    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+    END IF;        
     
 // -- SUB END -- //    
 

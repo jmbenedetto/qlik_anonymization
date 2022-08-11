@@ -1,4 +1,19 @@
-SUB Anon_Scrambling (P_TABLENAME , P_FIELDNAME)
+//#########################################################################################//
+/* -------------------------------------------------------------------
+
+Name : Anon_Scrambling
+
+----------------------------------------------------------------------
+Original Rule :	Scrambling - change letter sort
+ 	Params :
+    	1 - Delete Original Field (Y/N)
+		  2 - Table Name
+      3 - Field Name
+
+-------------------------------------------------------------------*/
+
+
+SUB Anon_Scrambling (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME)
 
 TRACE ##################################################;
 TRACE ## Starting Function : Anon_Scrambling  ##;
@@ -10,51 +25,57 @@ LET scrambledChars='$(scrambledChars)$(scrambledChars)' ;
 LET scrambledNumbers='0123456789' ;
 LET scrambledNumbers='$(scrambledNumbers)$(scrambledNumbers)' ;
 
-[OriginalDistinctValues]:
-LOAD Distinct $(P_FIELDNAME) as 'OriginalValue' Resident [$(P_TABLENAME)];
+        [OriginalDistinctValues]:
+        LOAD Distinct [$(P_FIELDNAME)] as 'OriginalValue' Resident [$(P_TABLENAME)];
 
-LET nbRows=NoOfRows('OriginalDistinctValues');
-FOR j=0 to $(nbRows)-1
-  LET valueBefore=Peek('OriginalValue',j,'OriginalDistinctValues') ;
-  LET valueAfter='' ;
-  LET nbChar=Len('$(valueBefore)');
-  IF nbChar>0 then
-    FOR k=1 to $(nbChar)
-      LET charBefore=Mid('$(valueBefore)',k,1);
-      LET charAfter='$(charBefore)';
-      IF FindOneOf('$(charBefore)','$(scrambledChars)')>0 then
-      	LET charAfter=Mid('$(scrambledChars)',Index('$(scrambledChars)','$(charBefore)')+floor(Rand()*26),1) ;
-      ELSEIF FindOneOf('$(charBefore)','$(scrambledNumbers)')>0 then
-      LET charAfter=Mid('$(scrambledNumbers)',Index('$(scrambledNumbers)','$(charBefore)')+floor(Rand()*10),1) ;
-  ENDIF;
-  LET valueAfter='$(valueAfter)$(charAfter)';
-  NEXT k ;
-  ENDIF;
+        LET nbRows=NoOfRows('OriginalDistinctValues');
+        FOR j=0 to $(nbRows)-1
+          LET valueBefore=Peek('OriginalValue',j,'OriginalDistinctValues') ;
+          LET valueAfter='' ;
+          LET nbChar=Len('$(valueBefore)');
+          IF nbChar>0 then
+            FOR k=1 to $(nbChar)
+              LET charBefore=Mid('$(valueBefore)',k,1);
+              LET charAfter='$(charBefore)';
+              IF FindOneOf('$(charBefore)','$(scrambledChars)')>0 then
+                LET charAfter=Mid('$(scrambledChars)',Index('$(scrambledChars)','$(charBefore)')+floor(Rand()*26),1) ;
+              ELSEIF FindOneOf('$(charBefore)','$(scrambledNumbers)')>0 then
+              LET charAfter=Mid('$(scrambledNumbers)',Index('$(scrambledNumbers)','$(charBefore)')+floor(Rand()*10),1) ;
+          ENDIF;
+          LET valueAfter='$(valueAfter)$(charAfter)';
+          NEXT k ;
+          ENDIF;
 
-  [AnonDistinctValues]:
-  LOAD
-  '$(valueBefore)' as [OldValue],
-  '$(valueAfter)' as [NewValue]
-  AutoGenerate 1;
-NEXT j ;
+          [AnonDistinctValues]:
+          LOAD
+          '$(valueBefore)' as [OldValue],
+          '$(valueAfter)' as [NewValue]
+          AutoGenerate 1;
+        NEXT j ;
 
-[AnonMapping]:
-Mapping
-LOAD
-[OldValue],
-[NewValue]
-Resident [AnonDistinctValues];
+        [Map_$(P_FIELDNAME)]:
+        Mapping
+        LOAD
+        [OldValue],
+        [NewValue]
+        Resident [AnonDistinctValues];
 
-[AnonValues]:
-LOAD *,
-ApplyMap('AnonMapping',[$(P_FIELDNAME)],'Error') as [Anon_$(P_FIELDNAME)]
-Resident [$(P_TABLENAME)];
+        [AnonValues]:
+        LOAD *,
+        ApplyMap('Map_$(P_FIELDNAME)',[$(P_FIELDNAME)],'Error') as [Anon_$(P_FIELDNAME)]
+        Resident [$(P_TABLENAME)];
 
-Drop tables [$(P_TABLENAME)], OriginalDistinctValues, AnonDistinctValues;
-Rename Table [AnonValues] to [$(P_TABLENAME)];
+        Drop tables [$(P_TABLENAME)], OriginalDistinctValues, AnonDistinctValues;
+        Rename Table [AnonValues] to [$(P_TABLENAME)];
+
+        IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+            Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+        END IF;  
   
 TRACE ##################################################;
 TRACE # Field anonymized successfully : $(P_FIELDNAME) #;
 TRACE ##################################################;
   
 END SUB
+
+//#########################################################################################//

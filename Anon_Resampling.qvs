@@ -5,12 +5,14 @@ Name : Anon_Resampling
 
 ----------------------------------------------------------------------
 Original Rule :	Replace with other values from the same domain :
-1 - Table Name
-2 - Field Name
+ 	Params :
+    	1 - Delete Original Field (Y/N)
+		2 - Table Name
+        3 - Field Name
 
 -------------------------------------------------------------------*/
 
-SUB Anon_Resampling (P_TABLENAME , P_FIELDNAME)
+SUB Anon_Resampling (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME)
 
 
 TRACE ##################################################;
@@ -20,50 +22,58 @@ TRACE ##################################################;
 
 //---------------------------------------//
 
-[DistinctValues]:
-Load Distinct 
-[$(P_FIELDNAME)] as [OldDistinctValue],
-RowNo() as [RowID],
-Rand() as [Random]
-Resident $(P_TABLENAME);
+	[DistinctValues]:
+	Load Distinct 
+		 [$(P_FIELDNAME)]  as [OldDistinctValue],
+		 RowNo() 		   as [RowID],
+		 Rand() 		   as [Random]
+	Resident $(P_TABLENAME);
 
-[AnonDistinctMapping]:
-Mapping
-Load
-RowNo(),
-[OldDistinctValue];
-Load
-[OldDistinctValue],
-[Random]
-Resident [DistinctValues]
-Order By [Random];
+	[Map_Distinct_$(P_FIELDNAME)]:
+	Mapping
+	Load
+		RowNo(),
+		[OldDistinctValue];
+	Load
+		[OldDistinctValue],
+		[Random]
+	Resident [DistinctValues]
+	Order By [Random];
 
-[AnonDistinctValues]:
-LOAD
-*,
-ApplyMap('AnonDistinctMapping',RowID,'Anon_Error') as [NewDistinctValue]
-Resident DistinctValues;
+	[AnonDistinctValues]:
+  	LOAD
+  		*,
+  		ApplyMap('Map_Distinct_$(P_FIELDNAME)',RowID,'Anon_Error') as [NewDistinctValue]
+  	Resident DistinctValues;
 
-Drop table DistinctValues;
+	Drop table DistinctValues;
 
-[AnonMapping]:
-Mapping
-Load
-[OldDistinctValue],
-[NewDistinctValue]
-Resident [AnonDistinctValues];
+	[Map_$(P_FIELDNAME)]:
+	Mapping
+	Load
+		[OldDistinctValue],
+		[NewDistinctValue]
+	Resident [AnonDistinctValues];
 
-Drop table AnonDistinctValues;
+	Drop table AnonDistinctValues;
+    
+    //-- Final Table -- //
+    
+    NoConcatenate
 
-[AnonValues]:
-LOAD
-*,
-ApplyMap('AnonMapping',[$(P_FIELDNAME)],'Anon_Error') as [Anon_$(P_FIELDNAME)]
-Resident $(P_TABLENAME);
+    [AnonValues]:
+    LOAD
+    	*,
+    	ApplyMap('Map_$(P_FIELDNAME)',[$(P_FIELDNAME)],'Anon_Error') as [Anon.$(P_FIELDNAME)]
+    Resident $(P_TABLENAME);
 
-Drop table $(P_TABLENAME);
+	Drop table $(P_TABLENAME);
 
-Rename table AnonValues to $(P_TABLENAME);
+	Rename table AnonValues to $(P_TABLENAME);
+    
+    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+    END IF;   
 
 
 END SUB

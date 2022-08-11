@@ -10,8 +10,7 @@
 		2 - Table Name
         3 - Field Name
         4 - Inline Table Name
-        
- 
+    
 -------------------------------------------------------------------*/
 
 let vInlineTable = 'INLINE_PERSON_NAME'; //--> DO NOT DELETE THIS LINE, just to not fail on the first execution

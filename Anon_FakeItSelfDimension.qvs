@@ -6,13 +6,14 @@
 ----------------------------------------------------------------------
  	Original Rule :	Replace Generic Master Data , from Inline possibles
  	Params :
-		1 - Table Name
-        2 - Field Name        
+    	1 - Delete Original Field (Y/N)
+		2 - Table Name
+        3 - Field Name
  
 -------------------------------------------------------------------*/
 
 
-SUB Anon_FakeItSelfDimension (P_TABLENAME , P_FIELDNAME)
+SUB Anon_FakeItSelfDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME)
 
 	
 TRACE ####################################################;
@@ -69,7 +70,7 @@ TRACE ####################################################;
     
     // -- Final Fake Dimension Table with the exactly amount of lines , based on the selected INLINE map -- //
     
-        [Map_$(P_INLINETABLE)]:
+        [Map_$(P_FIELDNAME)]:
         Mapping
         LOAD
             True,
@@ -88,8 +89,7 @@ TRACE ####################################################;
     LOAD
     	*,
         
-        [$(P_FIELDNAME)]						as [BA.$(P_FIELDNAME)],   // BA = Before Anon
-        ApplyMap('Map_$(P_INLINETABLE)',[$(P_FIELDNAME)],Null())		as [Anon.$(P_FIELDNAME)]
+        ApplyMap('Map_$(P_FIELDNAME)',[$(P_FIELDNAME)],Null())		as [Anon.$(P_FIELDNAME)]
         
         
     Resident [$(P_TABLENAME)];
@@ -98,9 +98,9 @@ TRACE ####################################################;
     
     Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
     
-    // -- > REPLACE ORIGINAL FIELD BY ANON FIELD
-    Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];  
-    Rename field [Anon.$(P_FIELDNAME)] to [$(P_FIELDNAME)];  // Anon field to original field       
+    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
+    END IF; 
     
 // -- SUB END -- //    
 
