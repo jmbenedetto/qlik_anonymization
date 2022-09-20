@@ -20,6 +20,7 @@ No download required.
 ```qlik
 $(Must_Include=[$(data_connection_to_gcs)00.fInitializeAnonymization.qvs])
 CALL fInitializeAnonymization('default','default')
+```
 
 - After that, feel free to call any anonymization function available.
 
@@ -28,10 +29,10 @@ CALL fInitializeAnonymization('default','default')
 - Make sure you downloaded all qvs files from the folders v1 and Datasets to a location available to Qlick Cloud.
 - With the files available:load 00.fInitializeAnonymization.qvs with Must_Include and call 00.fInitializeAnonymization. Please pass the full path for the anonymization scripts as the first parameter, and the full path for the datasets (inline tables in qvs) as the second parameter.
 
-'''qlik
+```qlik
 $(Must_Include=[$(data_connection_to_gcs)00.fInitializeAnonymization.qvs])
 CALL fInitializeAnonymization('$(vPathToScript)','vPathToDatasets')
-'''
+```
 
 - After that, feel free to call any anonymization function available.
 
