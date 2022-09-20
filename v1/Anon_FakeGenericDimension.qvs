@@ -15,7 +15,7 @@
 
 let vInlineTable = 'INLINE_PERSON_NAME'; //--> DO NOT DELETE THIS LINE, just to not fail on the first execution
 
-SUB Anon_FakeGenericDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
+SUB Anon_FakeGenericDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE,P_DATACONNECTION)
 
 	
 TRACE ####################################################;

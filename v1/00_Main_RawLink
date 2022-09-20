@@ -1,9 +1,0 @@
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/00_Main_Anonymization_Library.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_Exists.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_FakeGenericDimension.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_FakeItSelfDimension.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_FakeWord.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_Resampling.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_Scrambling.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_Tokenize.qvs
-https://raw.githubusercontent.com/jmbenedetto/qlik_anonymization/main/Anon_ValueReduction.qvs
