@@ -13,7 +13,7 @@
  
 -------------------------------------------------------------------*/
 
-SUB Anon_Tokenize (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
+SUB Anon_Tokenize (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME, P_TOKENS)
 
 	
 TRACE ####################################################;
@@ -28,7 +28,7 @@ TRACE ####################################################;
     LOAD
     	*,
         
-        Left(Hash128([$(P_FIELDNAME)]),10)		as [Anon.$(P_FIELDNAME)]
+        Left(Hash128([$(P_FIELDNAME)]),$(P_TOKENS))		as [Anon.$(P_FIELDNAME)]
         
         
     Resident [$(P_TABLENAME)];
@@ -37,7 +37,7 @@ TRACE ####################################################;
     
     Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
     
-    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    IF MixMatch($(P_DELETE_ORIGINAL_FIELD),'Y') THEN
     	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
     END IF;        
     

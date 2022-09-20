@@ -15,7 +15,7 @@
 
 let vInlineTable = 'INLINE_PERSON_NAME'; //--> DO NOT DELETE THIS LINE, just to not fail on the first execution
 
-SUB Anon_FakeGenericDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE,P_DATACONNECTION)
+SUB Anon_FakeGenericDimension (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_INLINETABLE)
 
 	
 TRACE ####################################################;
@@ -41,7 +41,7 @@ TRACE ####################################################;
 
     LET vInlineTable = '$(P_INLINETABLE)'; //--> not working with the default param
     	
-    	$(must_include=[lib://:DataFiles/$(vInlineTable).qvs]); //must include the INLINE table and delete later
+    	$(must_include=[$(vPathtoData)/$(vInlineTable).qvs]); //must include the INLINE table and delete later
         
     Join ($(P_INLINETABLE))
 
@@ -101,7 +101,7 @@ TRACE ####################################################;
     
     Rename table [Anon_$(P_TABLENAME)] to [$(P_TABLENAME)];
     
-    IF MixMatch(P_DELETE_ORIGINAL_FIELD,'Y') THEN
+    IF MixMatch($(P_DELETE_ORIGINAL_FIELD),'Y') THEN
     	Drop field [$(P_FIELDNAME)] from [$(P_TABLENAME)];
     END IF;
    
