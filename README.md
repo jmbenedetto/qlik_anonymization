@@ -17,10 +17,10 @@ No download required.
 - To create a data connection in Qlik Cloud to our GCS bucket, check our organization profile in Github (https://github.com/qlik-giants#how-to-use-our-solutions).
 - With the data connection created, load 00.fInitializeAnonymization.qvs with Must_Include and call 00.fInitializeAnonymization using 'default' for both parameters.
 
-'''qlik
+```qlik
 $(Must_Include=[$(data_connection_to_gcs)00.fInitializeAnonymization.qvs])
 CALL fInitializeAnonymization('default','default')
-'''
+
 - After that, feel free to call any anonymization function available.
 
 1. From a different location
