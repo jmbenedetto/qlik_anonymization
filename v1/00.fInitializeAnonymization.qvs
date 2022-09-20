@@ -1,0 +1,88 @@
+SUB fInitializeAnonymization (pPathtoScripts, pPathtoData);
+/***************************************************************************************
+Objective: This script load all anonymization scripts available using Must_Include.
+Parameters:
+    - pPathtoScripts: Complete path (without the last /) to where the anonymization scripts are
+    stored as qvs files. Use "default" to let the script get files from
+    GCS repository from qlik-giants.
+    - pPathtoData: Complete path (without the last /) to where the data used by the nonymization scripts are
+    stored as qvs files. Use "default" to let the script get files from
+    GCS repository from qlik-giants.
+*/
+
+IF $(pPathtoScripts)="default" THEN
+    SET vPathtoScripts='https://console.cloud.google.com/storage/browser/qlik-giants-github/qc_anonymization/v1';
+ELSE
+    LET vPathtoScripts = '$(pPathtoScripts)';
+END IF;
+
+IF $(pPathtoData)="default" THEN
+    SET vPathtoData='https://console.cloud.google.com/storage/browser/qlik-giants-github/qc_anonymization/Datasets';
+ELSE
+    LET vPathtoData = '$(pPathtoData)';
+END IF;
+
+[Scripts]:
+LOAD * INLINE [
+    Script
+    Anon_Exists.qvs
+    Anon_FakeGenericDimension.qvs
+    Anon_FakeItSelfDimension.qvs
+    Anon_FakeWord.qvs
+    Anon_Resampling.qvs
+    Anon_Scrambling.qvs
+    Anon_Tokenize.qvs
+    Anon_ValueReduction.qvs
+    99.Override_ALL_Anon_Field_Name_to_Original_Field_Name.qvs
+]
+
+FOR i=0 TO NoOfRows('Scripts')-1
+    LET vScript = Peek('Script',$(i),'Scripts');
+    $(must_include=[$(vPathtoScripts)/$(vScript)];
+NEXT i
+
+// $(must_include=[$(vPathtoScripts/Anon_Exists.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_FakeGenericDimension.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_FakeItSelfDimension.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_FakeWord.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_Resampling.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_Scrambling.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_Tokenize.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/Anon_ValueReduction.qvs]);
+// $(must_include=[$(vDataConnection)/qc_anonymization/v1/99.Override_ALL_Anon_Field_Name_to_Original_Field_Name.qvs]);
+
+
+/* Functions and Parameters :
+
+	1 - Anon_FakeGenericDimension ( Delete Original Field (Y/N) /Table Name / Field Name / Inline Table Name )
+    2 - Anon_FakeWord			  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    3 - Anon_Exists				  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    4 - Anon_Resampling			  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    5 - Anon_Scrambling			  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    6 - Anon_Tokenize			  ( Delete Original Field (Y/N) /Table Name / Field Name / # tokens)
+    7 - Anon_ValueReduction		  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    8 - Anon_FakeItSelfDimension  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    
+    INLINES DataSet avaiables :
+    
+    1 - INLINE_PERSON_NAME
+    2 - INLINE_COMPANY_NAME
+    3 - INLINE_COMPANY_DEPARTMENT
+    4 - INLINE_CURRENCY_NAME
+    5 - INLINE_JOB_TITLE
+    6 - INLINE_COLOR_NAME
+    7 - INLINE_EMAIL
+    8 - INLINE_US_STATES
+    
+    EXAMPLES :
+
+    CALL Anon_FakeGenericDimension		('Y','Product Lines','Product Line 3','INLINE_US_STATES');
+    CALL Anon_FakeWord					('N','Items','Bookings Group 1');
+    CALL Anon_Tokenize    			    ('Y','Invoices','PO Number',10);
+    
+    
+
+*/
+
+    
+//-----------------------------------------------------------------------------------------//
