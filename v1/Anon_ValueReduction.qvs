@@ -4,15 +4,17 @@
 	Name : Anon_ValueReduction
     
 ----------------------------------------------------------------------
- 	Original Rule :	round(x*2/3+50000,1) if x>=0 else round(x*2/3-50000,1))
+
  	Params :
     	1 - Delete Original Field (Y/N)
 		2 - Table Name
         3 - Field Name
+		4 - Value to be multiplied each row
+		5 - Value to be increased if field positive value and decreased if negative value
  
 -------------------------------------------------------------------*/
 
-SUB Anon_ValueReduction (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME)
+SUB Anon_ValueReduction (P_DELETE_ORIGINAL_FIELD , P_TABLENAME , P_FIELDNAME , P_VALUE_MULTIPLY , P_VALUE_SUM)
 
 TRACE ##################################################;
 TRACE ## Starting Function : Anon_ValueReduction  ##;
@@ -28,8 +30,8 @@ TRACE ##################################################;
         
         IF(
         	[$(P_FIELDNAME)] >=0,
-            	round([$(P_FIELDNAME)] * (2/3) + 500),
-                	round([$(P_FIELDNAME)] * (2/3) - 500)
+            	round([$(P_FIELDNAME)] * [$(P_VALUE_MULTIPLY)] + [$(P_VALUE_SUM)]),
+                	round([$(P_FIELDNAME)] * [$(P_VALUE_MULTIPLY)] - [$(P_VALUE_SUM)])
         ) 											as [Anon.$(P_FIELDNAME)]
         
         

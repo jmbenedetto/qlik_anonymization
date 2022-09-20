@@ -60,7 +60,7 @@ NEXT i
     4 - Anon_Resampling			  ( Delete Original Field (Y/N) /Table Name / Field Name )
     5 - Anon_Scrambling			  ( Delete Original Field (Y/N) /Table Name / Field Name )
     6 - Anon_Tokenize			  ( Delete Original Field (Y/N) /Table Name / Field Name / # tokens)
-    7 - Anon_ValueReduction		  ( Delete Original Field (Y/N) /Table Name / Field Name )
+    7 - Anon_ValueReduction		  ( Delete Original Field (Y/N) /Table Name / Field Name / Value to be multiplied each row / Value to be increased)
     8 - Anon_FakeItSelfDimension  ( Delete Original Field (Y/N) /Table Name / Field Name )
     
     INLINES DataSet avaiables :
